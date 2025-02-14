@@ -30,7 +30,7 @@ function Login() {
       }, 1000);
       navigate('/')
     } catch (err) {
-      alert(err.response.data.message)
+      alert(err?.response?.data?.message)
     }
   };
 
