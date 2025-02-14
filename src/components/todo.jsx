@@ -34,7 +34,7 @@ const Todo = () => {
     };
 
     try {
-      const response = await axios.put(`${mainurl}/todosroute/addtodo`, newTodo, { withCredentials: true });
+      const response = await axios.post(`${mainurl}/todosroute/addtodo`, newTodo, { withCredentials: true });
         if (response.status) {
         alert(response.data.message);
         }
