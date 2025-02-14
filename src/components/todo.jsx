@@ -28,7 +28,7 @@ const Todo = () => {
     const newTodo = {
       title,
       description,
-      dueDate: dueDateObj,
+      dueDays: dueDateObj,
       time,
       // Note: uid and userId should be added here based on your auth system
     };
