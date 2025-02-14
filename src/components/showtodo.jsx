@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Edit, Trash2, Clock, FileText, Check, Plus, Calendar, ListTodo } from 'lucide-react';
 import { useAuth } from './context';
+import { mainurl } from './commonfile';
 
 function Showtodo() {
   const { todos } = useAuth();
@@ -36,7 +37,7 @@ function Showtodo() {
 
     try {
       const response = await axios.put(
-        `http://localhost:4000/todosroute/updatetodo/${id}`,
+        `${mainurl}/todosroute/updatetodo/${id}`,
         {
           title: updatedTitle,
           description: updatedDescription,
@@ -69,7 +70,7 @@ function Showtodo() {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:4000/todosroute/deletetodo/${id}`,
+        `${mainurl}/todosroute/deletetodo/${id}`,
         { withCredentials: true }
       );
 
