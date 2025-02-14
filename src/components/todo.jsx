@@ -34,8 +34,10 @@ const Todo = () => {
     };
 
     try {
-      await axios.put(`${mainurl}/todosroute/addtodo`, newTodo, { withCredentials: true });
-      alert('Todo added successfully!');
+      const response = await axios.put(`${mainurl}/todosroute/addtodo`, newTodo, { withCredentials: true });
+        if (response.status) {
+        alert(response.data.message);
+        }
       resetForm();
     } catch (error) {
       console.error('Error adding todo:', error);
