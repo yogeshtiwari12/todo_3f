@@ -1,18 +1,105 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "./context";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { mainurl } from "./commonfile";
-import { useTheme } from "../themeprovider";
+import { useTheme as useAppTheme } from "../themeprovider";
 import { Sun, Moon, Menu, X } from "lucide-react";
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  Box, 
+  Drawer, 
+  List, 
+  ListItem, 
+  IconButton, 
+  Container, 
+  Fade, 
+  Divider
+} from "@mui/material";
+import { styled } from "styled-components";
+
+const Logo = styled(Typography)`
+  font-weight: 700;
+  color: ${props => props.theme === "dark" ? "white" : "#1E3A8A"};
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+`;
+
+const LogoSpan = styled.span`
+  color: #2563EB;
+`;
+
+const NavLink = styled(Link)`
+  font-weight: 600;
+  color: ${props => props.theme === "dark" ? "white" : "#1E40AF"};
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  
+  &:hover {
+    color: ${props => props.theme === "dark" ? "#D1D5DB" : "#2563EB"};
+    background-color: ${props => props.theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(37, 99, 235, 0.05)"};
+  }
+`;
+
+const ThemeButton = styled(IconButton)`
+  background-color: ${props => props.theme === "dark" ? "#374151" : "#E5E7EB"};
+  border-radius: 9999px;
+  padding: 0.5rem;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: ${props => props.theme === "dark" ? "#4B5563" : "#D1D5DB"};
+  }
+`;
+
+const MobileMenuButton = styled(IconButton)`
+  color: ${props => props.theme === "dark" ? "white" : "#1E40AF"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background-color: ${props => props.theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(37, 99, 235, 0.05)"};
+  }
+`;
+
+const MobileNavLink = styled(Link)`
+  display: block;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: ${props => props.theme === "dark" ? "white" : "#1E40AF"};
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-align: center;
+  
+  &:hover {
+    background-color: ${props => props.theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(59, 130, 246, 0.05)"};
+  }
+`;
+
+const ActionButton = styled(Button)`
+  font-weight: 600;
+  text-transform: none;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  border-radius: 6px;
+`;
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { profile } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useAppTheme();
   const mobileMenuRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -47,6 +134,7 @@ function Navbar() {
           theme: "light",
         });
         setTimeout(() => {
+          navigate("/login");
           window.location.reload();
         }, 1000);
       }
@@ -54,169 +142,180 @@ function Navbar() {
       toast.error("Logout failed, please try again.");
     }
   };
-
   return (
-    <nav className="relative w-full shadow-lg bg-blue-50 dark:bg-gray-900 dark:text-white">
-      <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-blue-900 dark:text-white">
-              Task<span className="text-blue-600">Box</span>
+    <>
+      <AppBar 
+        position="static" 
+        elevation={0}
+        sx={{ 
+          bgcolor: theme === "dark" ? "#111827" : "white",
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Logo theme={theme} variant="h6">
+                Task<LogoSpan>Box</LogoSpan>
+              </Logo>
             </Link>
-          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-sm font-semibold text-blue-800 dark:text-white hover:text-blue-600 dark:hover:text-gray-300 transition-colors duration-300"
-            >
-              Home
-            </Link>
-            <Link
-              to="/addtodo"
-              className="text-sm font-semibold text-blue-800 dark:text-white hover:text-blue-600 dark:hover:text-gray-300 transition-colors duration-300"
-            >
-              Add Todo
-            </Link>
-          </div>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
+              <NavLink to="/" theme={theme}>Home</NavLink>
+              <NavLink to="/addtodo" theme={theme}>Add Todo</NavLink>
+            </Box>
 
-          {/* Desktop Right Menu */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {profile?.role === "admin" && (
-              <Link
-                to="/dashboard"
-                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-300"
-              >
-                Dashboard
-              </Link>
-            )}
-            {profile ? (
-              <button
-                onClick={logout}
-                className="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400 transition-colors duration-300"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                to="/login"
-                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-300"
-              >
-                Login
-              </Link>
-            )}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5 text-gray-400" />
-              ) : (
-                <Moon className="w-5 h-5 text-blue-800" />
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
+              {profile?.role === "admin" && (
+                <ActionButton
+                  variant="contained"
+                  color="primary"
+                  component={Link}
+                  to="/dashboard"
+                  sx={{ bgcolor: '#2563EB', '&:hover': { bgcolor: '#1D4ED8' } }}
+                >
+                  Dashboard
+                </ActionButton>
               )}
-            </button>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="lg:hidden p-2 rounded-md text-blue-800 dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700"
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div
-          ref={mobileMenuRef}
-          className="lg:hidden absolute w-full bg-white dark:bg-gray-800 shadow-lg z-50"
-        >
-          <div className="flex flex-col items-center py-4">
-            {/* Navigation Links */}
-            <div className="flex flex-col items-center w-full mb-4">
-              <Link
-                to="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="py-2 text-base font-semibold text-blue-800 dark:text-white hover:text-blue-600 dark:hover:text-gray-300"
-              >
-                Home
-              </Link>
-              <Link
-                to="/addtodo"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="py-2 text-base font-semibold text-blue-800 dark:text-white hover:text-blue-600 dark:hover:text-gray-300"
-              >
-                Add Todo
-              </Link>
-            </div>
-
-            {/* Action Buttons Container */}
-            <div className="w-full px-4 space-y-2">
-              <div className="flex justify-between gap-2">
-                {profile?.role === "admin" && (
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex-1 text-center rounded-md bg-blue-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-                  >
-                    Dashboard
-                  </Link>
-                )}
-                {profile ? (
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex-1 rounded-md bg-red-500 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
-                  >
-                    Logout
-                  </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex-1 text-center rounded-md bg-blue-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-                  >
-                    Login
-                  </Link>
-                )}
-              </div>
-
-              {/* Theme Toggle */}
-              <button
-                onClick={() => {
-                  toggleTheme();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center justify-center space-x-2 rounded-md bg-gray-200 dark:bg-gray-700 py-2 text-sm font-semibold text-blue-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600"
+              
+              {profile ? (
+                <ActionButton
+                  variant="contained"
+                  onClick={logout}
+                  sx={{ bgcolor: '#EF4444', '&:hover': { bgcolor: '#DC2626' } }}
+                >
+                  Logout
+                </ActionButton>
+              ) : (
+                <ActionButton
+                  variant="contained"
+                  component={Link}
+                  to="/login"
+                  sx={{ bgcolor: '#2563EB', '&:hover': { bgcolor: '#1D4ED8' } }}
+                >
+                  Login
+                </ActionButton>
+              )}
+              
+              <ThemeButton
+                theme={theme}
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                size="small"
               >
                 {theme === "dark" ? (
-                  <>
-                    <Sun className="w-5 h-5 text-gray-400" />
-                    <span>Light Mode</span>
-                  </>
+                  <Sun size={20} color="#9CA3AF" />
                 ) : (
-                  <>
-                    <Moon className="w-5 h-5 text-blue-800" />
-                    <span>Dark Mode</span>
-                  </>
+                  <Moon size={20} color="#1E40AF" />
                 )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
+              </ThemeButton>
+            </Box>
+
+            <MobileMenuButton
+              theme={theme}
+              edge="end"
+              aria-label="menu"
+              onClick={toggleMobileMenu}
+              sx={{ display: { md: 'none' } }}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </MobileMenuButton>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      <Drawer
+        ref={mobileMenuRef}
+        anchor="top"
+        open={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        transitionComponent={Fade}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            bgcolor: theme === 'dark' ? '#1F2937' : 'white',
+            color: theme === 'dark' ? 'white' : '#1E3A8A',
+            pb: 2,
+            mt: '64px',
+          }
+        }}
+      >
+        <List>
+          <ListItem>
+            <MobileNavLink to="/" theme={theme} onClick={() => setIsMobileMenuOpen(false)}>
+              Home
+            </MobileNavLink>
+          </ListItem>
+          <ListItem>
+            <MobileNavLink to="/addtodo" theme={theme} onClick={() => setIsMobileMenuOpen(false)}>
+              Add Todo
+            </MobileNavLink>
+          </ListItem>
+          
+          <Divider sx={{ my: 1, bgcolor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+          
+          <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {profile?.role === "admin" && (
+              <ActionButton
+                fullWidth
+                variant="contained"
+                component={Link}
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                sx={{ bgcolor: '#2563EB', '&:hover': { bgcolor: '#1D4ED8' } }}
+              >
+                Dashboard
+              </ActionButton>
+            )}
+            
+            {profile ? (
+              <ActionButton
+                fullWidth
+                variant="contained"
+                onClick={() => {
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }}
+                sx={{ bgcolor: '#EF4444', '&:hover': { bgcolor: '#DC2626' } }}
+              >
+                Logout
+              </ActionButton>
+            ) : (
+              <ActionButton
+                fullWidth
+                variant="contained"
+                component={Link}
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                sx={{ bgcolor: '#2563EB', '&:hover': { bgcolor: '#1D4ED8' } }}
+              >
+                Login
+              </ActionButton>
+            )}
+            
+            <ActionButton
+              fullWidth
+              variant="outlined"
+              onClick={() => {
+                toggleTheme();
+                setIsMobileMenuOpen(false);
+              }}
+              startIcon={theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              sx={{ 
+                borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.12)',
+                color: theme === 'dark' ? 'white' : '#1E40AF',
+                '&:hover': { 
+                  bgcolor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(37, 99, 235, 0.05)',
+                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'
+                }
+              }}
+            >
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            </ActionButton>
+          </Box>
+        </List>
+      </Drawer>
+    </>
   );
 }
 

@@ -10,30 +10,44 @@ import Dashboard from "./components/dashboard/dashboard";
 import Allusers from "./components/dashboard/allusers";
 import UserTodos from "./components/usertodo";
 import { useAuth } from "./components/context";
-
-// Protected Route Component
-const ProtectedRoute = ({ element }) => {
-  const { profile } = useAuth();
-
-  return profile ? element : <Navigate to="/login" replace />;
-};
+import Loading from "./components/loading";
 
 function App() {
+  const { profile, isprofile, loading } = useAuth();
+
+  const isAuth = !!profile && !!isprofile;
+  console.log("state", isAuth);
+
+  if (loading) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-green-50">
       <BrowserRouter>
         <Navbar />
-
         <Routes>
-          <Route path="/" element={<Showtodo />}  />
-          <Route path="/addtodo" element={<ProtectedRoute element={<Todo />} />} />
+          <Route path="/" element={<Showtodo />} />
+          <Route
+            path="/addtodo"
+            element={isAuth ? <Todo /> : <Navigate to="/login" />}
+          />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-          <Route path="/allusers" element={<ProtectedRoute element={<Allusers />} />} />
-          <Route path="/usertodos/:uid" element={<ProtectedRoute element={<UserTodos />} />} />
-        </Routes>
+          <Route
+            path="/dashboard"
+            element={isAuth ? <Allusers /> : <Navigate to="/login" />}
+          />
 
+          <Route
+            path="/usertodos/:uid"
+            element={isAuth ? <UserTodos /> : <Navigate to="/login" />}
+          />
+        </Routes>
         <ToastContainer />
       </BrowserRouter>
     </div>

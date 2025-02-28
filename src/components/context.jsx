@@ -7,24 +7,33 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [todos, settodos] = useState(null);
   const [profile, setProfile] = useState(null);
-
-  // Fetch user profile
+  const [loading, setLoading] = useState(true);
+  const [isprofile, setIsProfile] = useState(false);
+ 
+  
   useEffect(() => {
     const fetchMyProfile = async () => {
       try {
-        const response = await axios.get(
-          `${mainurl}/userroute21/getauthuser`,
-          { withCredentials: true }
-        );
-        setProfile(response.data.user);
-        console.log("Profile:", response.data);
-        console.log("User:", response.data.user);
+        const response = await axios.get(`${mainurl}/userroute21/getauthuser`, {
+          withCredentials: true,
+        });
+  
+        if (response.data?.user) { // ✅ Check if user exists
+          setProfile(response.data.user);
+          setIsProfile(true);
+        } else {
+          setProfile(null);
+          setIsProfile(false);
+        }
       } catch (error) {
         console.error("Error fetching profile:", error.message);
         setProfile(null);
+        setIsProfile(false);
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchMyProfile();
   }, []);
 
@@ -51,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   }, [profile]);
 
   return (
-    <AuthContext.Provider value={{ todos, profile }}>
+    <AuthContext.Provider value={{ todos, profile,loading ,isprofile}}>
       {children}
     </AuthContext.Provider>
   );

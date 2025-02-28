@@ -11,13 +11,101 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context";
 import { useNavigate, Link } from "react-router-dom";
+import {
+  Box,
+  Drawer,
+  Typography,
+  IconButton,
+  Button,
+  Avatar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+  Paper,
+  Container,
+  Divider,
+  Card,
+  CardContent,
+  Tooltip,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useTheme as useAppTheme } from "../../themeprovider";
+// Styled Components
+const StyledDrawer = styled(Drawer)(({ theme, isdark }) => ({
+  width: 280,
+  flexShrink: 0,
+  "& .MuiDrawer-paper": {
+    width: 280,
+    boxSizing: "border-box",
+    backgroundColor: isdark === "true" ? "#1F2937" : "#FFFFFF",
+    borderRight: "none",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    transition: "width 0.3s ease",
+  },
+}));
+
+const StyledNavItem = styled(ListItem)(({ theme, isdark, active }) => ({
+  borderRadius: "0.5rem",
+  marginBottom: "0.5rem",
+  backgroundColor: active
+    ? isdark === "true"
+      ? "rgba(59, 130, 246, 0.1)"
+      : "#EBF5FF"
+    : "transparent",
+  color: active
+    ? isdark === "true"
+      ? "#60A5FA"
+      : "#2563EB"
+    : isdark === "true"
+    ? "#D1D5DB"
+    : "#4B5563",
+  "&:hover": {
+    backgroundColor: isdark === "true" ? "rgba(55, 65, 81, 0.7)" : "#F3F4F6",
+  },
+}));
+
+const MainContent = styled(Box)(({ theme, isdark }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  backgroundColor: isdark === "true" ? "#111827" : "#F3F4F6",
+  minHeight: "100vh",
+  transition: "margin-left 0.3s ease",
+}));
+
+const ProfileCard = styled(Box)(({ theme, isdark }) => ({
+  padding: theme.spacing(3),
+  textAlign: "center",
+  "& .MuiAvatar-root": {
+    width: 80,
+    height: 80,
+    margin: "0 auto",
+    marginBottom: theme.spacing(2),
+    backgroundColor: isdark === "true" ? "#3B82F6" : "#2563EB",
+    fontSize: "2rem",
+    fontWeight: "bold",
+  },
+}));
+
+const StyledCard = styled(Card)(({ theme, isdark }) => ({
+  backgroundColor: isdark === "true" ? "#1F2937" : "#FFFFFF",
+  borderRadius: "1rem",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: "0 8px 12px -1px rgba(0, 0, 0, 0.15)",
+  },
+}));
 
 function Dashboard() {
   const { todos, profile } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [newTodo, setNewTodo] = useState("");
   const navigate = useNavigate();
+  const { theme } = useAppTheme();
 
   const handleAddTodo = () => {
     // Todo: Implement add todo functionality
@@ -28,145 +116,253 @@ function Dashboard() {
     switch (activeTab) {
       case "add-todo":
         return (
-          <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl p-8 shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
-              Create New Todo
-            </h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAddTodo();
-              }}
-              className="space-y-4"
-            >
-              <input
-                type="text"
-                value={newTodo}
-                onChange={(e) => setNewTodo(e.target.value)}
-                placeholder="Enter Todo title"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition flex items-center justify-center space-x-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          <StyledCard isdark={theme === "dark" ? "true" : "false"}>
+            <CardContent>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                  color: theme === "dark" ? "#60A5FA" : "#2563EB",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  mb: 3,
+                }}
               >
-                <PlusCircle size={20} />
-                <span>Add Todo</span>
-              </button>
-            </form>
-          </div>
+                Create New Todo
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddTodo();
+                }}
+                sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+              >
+                <TextField
+                  fullWidth
+                  value={newTodo}
+                  onChange={(e) => setNewTodo(e.target.value)}
+                  placeholder="Enter Todo title"
+                  variant="outlined"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
+                      "& fieldset": {
+                        borderColor: theme === "dark" ? "#4B5563" : "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: theme === "dark" ? "#6B7280" : "#60A5FA",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: theme === "dark" ? "#60A5FA" : "#2563EB",
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: theme === "dark" ? "#FFFFFF" : "inherit",
+                    },
+                  }}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  startIcon={<PlusCircle size={20} />}
+                  sx={{
+                    backgroundColor: theme === "dark" ? "#3B82F6" : "#2563EB",
+                    "&:hover": {
+                      backgroundColor: theme === "dark" ? "#2563EB" : "#1D4ED8",
+                    },
+                    textTransform: "none",
+                    py: 1.5,
+                  }}
+                >
+                  Add Todo
+                </Button>
+              </Box>
+            </CardContent>
+          </StyledCard>
         );
       default:
         return (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-            <h2 className="text-2xl text-gray-600 dark:text-white mb-4">
-              Welcome, {profile?.name || "User"}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Select an option from the sidebar to get started
-            </p>
-          </div>
+          <StyledCard isdark={theme === "dark" ? "true" : "false"}>
+            <CardContent>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                  color: theme === "dark" ? "#60A5FA" : "#2563EB",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                Welcome, {profile?.name || "User"}
+              </Typography>
+              <Typography
+                sx={{
+                  color: theme === "dark" ? "#D1D5DB" : "#4B5563",
+                  textAlign: "center",
+                }}
+              >
+                Select an option from the sidebar to get started
+              </Typography>
+            </CardContent>
+          </StyledCard>
         );
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 pt-16">
-      {/* Enhanced Sidebar - adjusted top position to account for navbar */}
-      <div
-        className={`bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 ease-in-out fixed top-16 bottom-0 z-10 ${
-          isSidebarOpen ? "w-72" : "w-20"
-        }`}
+    <Box sx={{ display: "flex" }}>
+      <StyledDrawer
+        variant="permanent"
+        isdark={theme === "dark" ? "true" : "false"}
+        sx={{
+          width: isSidebarOpen ? 280 : 80,
+          "& .MuiDrawer-paper": {
+            width: isSidebarOpen ? 280 : 80,
+          },
+        }}
       >
-        {/* Improved toggle button */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute -right-3 top-8 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-600"
-          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isSidebarOpen ? <ChevronLeft size={18} className="dark:text-white" /> : <ChevronRight size={18} className="dark:text-white" />}
-        </button>
-
-        <div className="p-6 h-full flex flex-col">
-          {/* App Name instead of "Dashboard" in navbar */}
-          <div className="mb-8 flex items-center justify-center">
+        {/* Drawer content */}
+        <Box sx={{ p: 3 }}>
+          {/* Logo */}
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
             {isSidebarOpen ? (
-              <h1 className="text-xl font-bold text-blue-600 dark:text-blue-400">Todo App</h1>
+              <Typography
+                variant="h6"
+                sx={{ color: theme === "dark" ? "#60A5FA" : "#2563EB" }}
+              >
+                Todo App
+              </Typography>
             ) : (
-              <ListTodo size={24} className="text-blue-600 dark:text-blue-400" />
+              <ListTodo
+                size={24}
+                color={theme === "dark" ? "#60A5FA" : "#2563EB"}
+              />
             )}
-          </div>
-          
-          {/* Enhanced Profile Section */}
-          {profile && (
-            <div className="mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center shadow-lg">
-                <span className="text-xl font-bold text-white">
-                  {profile.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              {isSidebarOpen && (
-                <>
-                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white text-center truncate">
-                    {profile.name}
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm text-center mt-1 truncate">{profile.email}</p>
-                </>
-              )}
-            </div>
-          )}
+          </Box>
 
-          {/* Enhanced Navigation */}
-          <nav className="space-y-2 flex-1">
-            <button
+          {/* Profile Section */}
+          <ProfileCard isdark={theme === "dark" ? "true" : "false"}>
+            <Avatar>{profile?.name?.charAt(0).toUpperCase()}</Avatar>
+            {isSidebarOpen && (
+              <>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: theme === "dark" ? "#FFFFFF" : "#111827",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {profile?.name}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme === "dark" ? "#D1D5DB" : "#4B5563" }}
+                >
+                  {profile?.email}
+                </Typography>
+              </>
+            )}
+          </ProfileCard>
+
+          <Divider sx={{ my: 2 }} />
+
+          {/* Navigation */}
+          <List>
+            <StyledNavItem
+              button
               onClick={() => setActiveTab("dashboard")}
-              className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 group ${
-                activeTab === "dashboard" || activeTab === ""
-                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
-              }`}
+              active={activeTab === "dashboard" ? 1 : 0}
+              isdark={theme === "dark" ? "true" : "false"}
             >
-              <Home size={20} className="group-hover:scale-110 transition-transform duration-300" />
-              {isSidebarOpen && <span>Dashboard</span>}
-            </button>
-            
- 
-            
-           
-            
-            <Link
+              <ListItemIcon>
+                <Home
+                  size={20}
+                  color={
+                    activeTab === "dashboard"
+                      ? theme === "dark"
+                        ? "#60A5FA"
+                        : "#2563EB"
+                      : theme === "dark"
+                      ? "#D1D5DB"
+                      : "#4B5563"
+                  }
+                />
+              </ListItemIcon>
+              {isSidebarOpen && <ListItemText primary="Dashboard" />}
+            </StyledNavItem>
+
+            <StyledNavItem
+              button
+              component={Link}
               to="/allusers"
-              className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 group
-                hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300`}
+              isdark={theme === "dark" ? "true" : "false"}
             >
-              <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
-              {isSidebarOpen && <span>Users</span>}
-            </Link>
-            
-        
-          </nav>
+              <ListItemIcon>
+                <Users
+                  size={20}
+                  color={theme === "dark" ? "#D1D5DB" : "#4B5563"}
+                />
+              </ListItemIcon>
+              {isSidebarOpen && <ListItemText primary="Users" />}
+            </StyledNavItem>
+          </List>
 
-          {/* Enhanced Logout Button */}
-          <button
-            className="w-full flex items-center space-x-3 p-3 mt-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group border-t border-gray-100 dark:border-gray-700"
-            onClick={() => navigate("/")}
-          >
-            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform duration-300" />
-            {isSidebarOpen && <span>Logout</span>}
-          </button>
-        </div>
-      </div>
+          {/* Logout Button */}
+          <Box sx={{ mt: "auto" }}>
+            <Button
+              fullWidth
+              startIcon={<LogOut size={20} />}
+              onClick={() => navigate("/")}
+              sx={{
+                justifyContent: isSidebarOpen ? "flex-start" : "center",
+                color: theme === "dark" ? "#EF4444" : "#DC2626",
+                "&:hover": {
+                  backgroundColor: theme === "dark"
+                    ? "rgba(239, 68, 68, 0.1)"
+                    : "rgba(220, 38, 38, 0.1)",
+                },
+                textTransform: "none",
+              }}
+            >
+              {isSidebarOpen && "Logout"}
+            </Button>
+          </Box>
+        </Box>
 
-      {/* Main Content - adjusted margin left to account for sidebar */}
-      <main
-        className={`flex-1 p-8 transition-all duration-300 ${
-          isSidebarOpen ? "ml-72" : "ml-20"
-        }`}
+        {/* Sidebar Toggle */}
+        <IconButton
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          sx={{
+            position: "absolute",
+            right: -20,
+            top: 80,
+            backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            "&:hover": {
+              backgroundColor: theme === "dark" ? "#4B5563" : "#F3F4F6",
+            },
+          }}
+        >
+          {isSidebarOpen ? (
+            <ChevronLeft color={theme === "dark" ? "#FFFFFF" : "#111827"} />
+          ) : (
+            <ChevronRight color={theme === "dark" ? "#FFFFFF" : "#111827"} />
+          )}
+        </IconButton>
+      </StyledDrawer>
+
+      {/* Main Content */}
+      <MainContent
+        isdark={theme === "dark" ? "true" : "false"}
+        sx={{
+          marginLeft: isSidebarOpen ? "280px" : "80px",
+          padding: 4,
+        }}
       >
-        {renderContent()}
-      </main>
-    </div>
+        <Container maxWidth="lg">{renderContent()}</Container>
+      </MainContent>
+    </Box>
   );
 }
 

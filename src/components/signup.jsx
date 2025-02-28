@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { mainurl } from './commonfile';
+import { Mail, Lock, User, Shield, Key, Loader2 } from 'lucide-react';
 
 function Signup() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user'); // Default role: User
-    const [otp, setOtp] = useState();
+    const [role, setRole] = useState('user');
+    const [otp, setOtp] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -27,15 +28,17 @@ function Signup() {
 
         try {
             const response = await axios.put(`${mainurl}/userroute21/signup`, {
-                name,
-                email,
-                password,
-                role,
-            });
+                name, email, password, role,
+
+            },
+            {withCredentials: true}
+        );
 
             if (response.status === 200) {
                 setIsOtpSent(true);
+                
                 toast.success('OTP sent successfully');
+
             }
         } catch (error) {
             toast.error('Error signing up: ' + error.response?.data?.message);
@@ -56,16 +59,12 @@ function Signup() {
 
         try {
             const response = await axios.post(`${mainurl}/userroute21/signup/verify`, {
-                name,
-                email,
-                otp:otp,
-                password,
-                role, // Send role for verification
+                name, email, otp, password, role,
             });
 
             if (response.status === 200) {
+                alert('Signup Successful');
                 toast.success('Signup Successful');
-                alert("Signup Successful")
                 navigate('/login');
             }
         } catch (error) {
@@ -76,109 +75,124 @@ function Signup() {
     };
 
     return (
-        <div className="bg-gray-100 flex items-center justify-center h-screen">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-bold mb-6 text-center">
-                    {isOtpSent ? 'Verify OTP' : 'Sign Up'}
-                </h2>
-
-                <form className="space-y-4" onSubmit={isOtpSent ? handleVerifyOtp : handleSignup}>
-                    {!isOtpSent && (
-                        <>
-                            <div>
-                                <label htmlFor="name" className="block text-gray-700">
-                                    Name
-                                </label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="email" className="block text-gray-700">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="password" className="block text-gray-700">
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="role" className="block text-gray-700">
-                                    Role
-                                </label>
-                                <select
-                                    id="role"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={role}
-                                    onChange={(e) => setRole(e.target.value)}
-                                    required
-                                >
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                        </>
-                    )}
-
-                    {isOtpSent && (
-                        <div>
-                            <label htmlFor="otp" className="block text-gray-700">
-                                OTP
-                            </label>
-                            <input
-                                type="number"
-                                id="otp"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={otp}
-                                onChange={(e) => setOtp(parseInt(e.target.value))}
-                                required
-                            />
-                        </div>
-                    )}
-
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            disabled={loading}
-                        >
-                            {loading ? (isOtpSent ? 'Verifying OTP...' : 'Signing Up...') : (isOtpSent ? 'Verify OTP' : 'Sign Up')}
-                        </button>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                    <div className="mb-8 text-center">
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+                            {isOtpSent ? 'Verify Your Email' : 'Create Account'}
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {isOtpSent 
+                                ? 'Please enter the OTP sent to your email'
+                                : 'Join us and start managing your tasks effectively'}
+                        </p>
                     </div>
 
-                    {!isOtpSent && (
-                        <div>
-                            <Link
-                                to="/login"
-                                className="w-full text-black py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
-                            >
-                                Already have an account? Login
-                            </Link>
-                        </div>
-                    )}
-                </form>
+                    <form className="space-y-6" onSubmit={isOtpSent ? handleVerifyOtp : handleSignup}>
+                        {!isOtpSent && (
+                            <>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <User className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Full Name"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Mail className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        placeholder="Email Address"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Lock className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        placeholder="Password"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Shield className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+                                        value={role}
+                                        onChange={(e) => setRole(e.target.value)}
+                                        required
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {isOtpSent && (
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Key className="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="number"
+                                    placeholder="Enter OTP"
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+                                    value={otp}
+                                    onChange={(e) => setOtp(parseInt(e.target.value))}
+                                    required
+                                />
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center space-x-2"
+                            disabled={loading}
+                        >
+                            {loading && <Loader2 className="animate-spin -ml-1 h-5 w-5" />}
+                            <span>
+                                {loading 
+                                    ? (isOtpSent ? 'Verifying...' : 'Creating Account...') 
+                                    : (isOtpSent ? 'Verify OTP' : 'Sign Up')}
+                            </span>
+                        </button>
+
+                        {!isOtpSent && (
+                            <p className="text-center text-gray-600 dark:text-gray-400">
+                                Already have an account?{' '}
+                                <Link
+                                    to="/login"
+                                    className="text-blue-500 hover:text-blue-600 font-medium transition-colors"
+                                >
+                                    Login
+                                </Link>
+                            </p>
+                        )}
+                    </form>
+                </div>
             </div>
         </div>
     );
